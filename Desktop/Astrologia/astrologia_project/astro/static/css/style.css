@@ -1,0 +1,35 @@
+:root {
+    --color-primary: #e3f2fd;
+    --color-secondary: #90caf9;
+    --color-accent: #42a5f5;
+    --color-text: #424242;
+    --color-background: #fafafa;
+}
+
+body {
+    font-family: 'Cormorant Garamond', serif;
+    background: linear-gradient(135deg, var(--color-background), var(--color-primary));
+    color: var(--color-text);
+}
+
+.navbar {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.footer {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 2rem 0;
+    margin-top: 3rem;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+}
+
+.
