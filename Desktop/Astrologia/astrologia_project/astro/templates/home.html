@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg">
@@ -20,7 +21,7 @@
     </nav>
 
     <main class="container my-4">
-        <h1 class="text-center mb-4">Videos Astrológicos</h1>
+        <h1 class="text-center mb-4">Videos</h1>
         
         <div class="row">
             {% for video in videos %}
@@ -68,7 +69,21 @@
 
     <footer class="footer">
         <div class="container text-center">
-            <p>&copy; 2024 Portal Astrológico. Todos los derechos reservados.</p>
+            <div class="social-icons mb-3">
+                <a href="https://instagram.com/tu-usuario" target="_blank" class="social-icon">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://facebook.com/tu-pagina" target="_blank" class="social-icon">
+                    <i class="fab fa-facebook"></i>
+                </a>
+                <a href="mailto:tu@email.com" class="social-icon">
+                    <i class="far fa-envelope"></i>
+                </a>
+                <a href="https://wa.me/tunumero" target="_blank" class="social-icon">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
+            <p>&copy; 2025 Portal Astrológico. Todos los derechos reservados.</p>
         </div>
     </footer>
 
@@ -216,6 +231,37 @@
 
         .mb-3 {
             margin-bottom: 1rem !important;
+        }
+        .social-icons {
+            margin-bottom: 1.5rem;
+        }
+
+        .social-icon {
+            color: var(--color-text);
+            font-size: 1.5rem;
+            margin: 0 15px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .social-icon:hover {
+            color: var(--color-accent);
+            transform: translateY(-3px);
+        }
+
+        .fa-instagram:hover {
+            color: #E1306C;
+        }
+
+        .fa-facebook:hover {
+            color: #4267B2;
+        }
+
+        .fa-envelope:hover {
+            color: #EA4335;
+        }
+
+        .fa-whatsapp:hover {
+            color: #25D366;
         }
     </style>
 </body>
