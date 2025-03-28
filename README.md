@@ -14,11 +14,11 @@ Para instalar el proyecto en tu máquina local, sigue estos pasos:
 
     Clonar el repositorio:
 
-      git clone https://github.com/catriel458/cinema-paradiso.git
+      git clone https://github.com/catriel458/biblioteca-210.git
 
     Acceder al directorio del proyecto:
 
-      cd cinema-paradiso
+      cd biblioteca-digital
 
     instalar paquetes:
 
