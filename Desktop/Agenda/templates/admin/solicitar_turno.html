@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Solicitar Turno para Paciente - Consultorio Odontológico{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .horario-btn {
+        transition: all 0.3s ease;
+    }
+    .horario-btn:hover {
+        transform: translateY(-2px);
+    }
+    #horarios-container {
+        transition: all 0.3s ease;
+    }
+    .horario-btn.active {
+        background-color: var(--bs-primary);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="mb-0">Solicitar Turno para Paciente</h4>
+            </div>
+            <div class="card-body p-4">
+                {% if not user.is_staff %}
+                <div class="alert alert-danger">
+                    No tienes permisos para acceder a esta sección.
+                </div>
+                {% else %}
+                <div class="row mb-4">
+                    <div class="col-12 mb-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-3"><i class="fas fa-user text-primary me-2"></i> Seleccionar Paciente</h5>
+                                <select class="form-select" id="usuario_id" name="usuario_id" required>
+                                    <option value="">Seleccione un paciente</option>
+                                    {% for usuario in usuarios %}
+                                    <option value="{{ usuario.id }}">{{ usuario.first_name }} {{ usuario.last_name }} - DNI: {{ usuario.DNI }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-3"><i class="fas fa-calendar-alt text-primary me-2"></i> Seleccionar Turno</h5>
+                                <div id="calendar" data-dias-disponibles="{{ dias_disponibles }}"></div>
+                                <div class="mt-4" id="horarios-container">
+                                    <h6 class="mb-3" id="fecha-seleccionada">Selecciona una fecha</h6>
+                                    <div id="mensaje-horarios" class="text-center py-3">
+                                        <i class="fas fa-calendar-day fa-2x mb-3 d-block text-muted"></i>
+                                        <p class="text-muted">Selecciona una fecha en el calendario para ver los horarios disponibles.</p>
+                                    </div>
+                                    <div id="lista-horarios" class="d-none"></div>
+                                </div>
+                                <div class="mt-4 d-none" id="confirmar-container">
+                                    <div class="alert alert-success">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-calendar-check me-2"></i>
+                                            <strong>Turno seleccionado:</strong>
+                                        </div>
+                                        <div id="resumen-turno" class="mb-2"></div>
+                                        <form method="post" action="{% url 'admin_confirmar_turno' %}" id="formSolicitarTurno">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="horario_id" id="horario_id">
+                                            <input type="hidden" name="usuario_id" id="usuario_id_hidden">
+                                            <button type="submit" class="btn btn-success w-100">
+                                                <i class="fas fa-check-circle me-2"></i> Confirmar Turno
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script src="{% static 'js/admin_solicitar_turno.js' %}"></script>
+{% endblock %}

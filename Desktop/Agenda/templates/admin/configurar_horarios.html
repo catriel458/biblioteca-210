@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configurar Horarios - Consultorio Odontológico{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Configuración de Días Disponibles</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <form id="formAgregarDia" class="row g-3">
+                            {% csrf_token %}
+                            <div class="col-md-6">
+                                <label for="fecha" class="form-label">Fecha</label>
+                                <input type="date" class="form-control" id="fecha" name="fecha" required>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="disponible" name="disponible" checked>
+                                    <label class="form-check-label" for="disponible">Día disponible</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Guardar Día
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="table-responsive mt-4">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-calendar me-2"></i>Fecha</th>
+                                    <th><i class="fas fa-check-circle me-2"></i>Estado</th>
+                                    <th><i class="fas fa-cog me-2"></i>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dias-lista">
+                                <!-- Los días se cargarán aquí dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Configuración de Horarios</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Horarios de Atención</h5>
+                        <p class="text-muted">Configure los horarios que estarán disponibles para las consultas</p>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th><i class="fas fa-clock me-2"></i>Hora</th>
+                                        <th><i class="fas fa-check-circle me-2"></i>Estado</th>
+                                        <th><i class="fas fa-cog me-2"></i>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="horarios-lista">
+                                    <!-- Los horarios se cargarán aquí dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button type="button" class="btn btn-primary mt-3" id="agregar-horario">
+                            <i class="fas fa-plus me-2"></i>Agregar Horario
+                        </button>
+                    </div>
+            
+                    <!-- Modal para agregar/editar horario -->
+                    <div class="modal fade" id="modalHorario" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Configurar Horario</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="formHorario">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <label class="form-label">Hora de inicio</label>
+                                            <input type="time" class="form-control" name="hora_inicio" required>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-primary" id="guardarHorario">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script src="{% static 'js/admin_horarios.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnAgregar = document.getElementById('agregar-horario');
+    const modalHorario = new bootstrap.Modal(document.getElementById('modalHorario'));
+    const formHorario = document.getElementById('formHorario');
+    
+    // Cargar horarios existentes
+    function cargarHorarios() {
+        const listaHorarios = document.getElementById('horarios-lista');
+        listaHorarios.innerHTML = '<tr><td colspan="3" class="text-center"><div class="spinner-border text-primary" role="status"></div></td></tr>';
+        
+        fetch('/admin/horarios/get_horarios/')
+            .then(response => response.json())
+            .then(data => {
+                listaHorarios.innerHTML = '';
+                if (data.length === 0) {
+                    listaHorarios.innerHTML = `
+                        <tr>
+                            <td colspan="3" class="text-center py-4">
+                                <i class="fas fa-clock fa-2x text-muted mb-3"></i>
+                                <p class="mb-0">No hay horarios configurados</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                data.forEach(horario => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-clock text-primary me-2"></i>
+                                ${horario.hora_inicio}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge rounded-pill bg-${horario.disponible ? 'success' : 'danger'}">
+                                <i class="fas fa-${horario.disponible ? 'check' : 'times'} me-1"></i>
+                                ${horario.disponible ? 'Disponible' : 'No disponible'}
+                            </span>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarHorario(${horario.id})">
+                                <i class="fas fa-trash me-1"></i>Eliminar
+                            </button>
+                        </td>
+                    `;
+                    listaHorarios.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudieron cargar los horarios'
+                });
+            });
+    }
+    
+    // Agregar nuevo horario
+    btnAgregar.addEventListener('click', () => {
+        formHorario.reset();
+        modalHorario.show();
+    });
+    
+    document.getElementById('guardarHorario').addEventListener('click', function() {
+        const formData = new FormData(formHorario);
+        
+        fetch('/admin/horarios/configurar/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                modalHorario.hide();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: 'Horario guardado correctamente',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                cargarHorarios();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Error al guardar el horario'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al guardar el horario'
+            });
+        });
+    });
+    
+    // Eliminar horario
+    window.eliminarHorario = function(id) {
+        Swal.fire({
+            title: '¿Está seguro?',
+            text: 'Esta acción no se puede deshacer',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/admin/horarios/eliminar/${id}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Eliminado',
+                            text: 'El horario ha sido eliminado',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        cargarHorarios();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Error al eliminar el horario'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al eliminar el horario'
+                    });
+                });
+            }
+        });
+    };
+    
+    // Cargar horarios al iniciar
+    cargarHorarios();
+});
+</script>
+{% endblock %}
