@@ -23,6 +23,10 @@ git clone https://github.com/catriel458/biblioteca-210-insti.git
 pip install django
 pip install pillow
 
+Cambiamos a la rama back (Finalizada)
+
+git checkout back
+
 3️⃣ Ejecutar el servidor de desarrollo
 
 Para poner en marcha el servidor, utiliza el siguiente comando:
